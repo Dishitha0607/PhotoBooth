@@ -5,16 +5,52 @@ import { useRef, useState } from "react";
 export default function App() {
   const webcamRef = useRef(null);
   const [photos, setPhotos] = useState([]);
+  const [countDown, setCountdown] = useState(null);
 
   // fillters
   const [filter, setFilter] = useState("none");
 
-  const capture = () => {
-    const imgSrc = webcamRef.current.getScreenshot();
+  // camera delay
+  const [delay, setDelay] = useState(3);
 
-    if (photos.length < 4) {
-      setPhotos([...photos, imgSrc]);
-    }
+  const takePhoto = () => {
+    const imgSrc = webcamRef.current.getScreenshot();
+    const img = new Image();
+    img.src = imgSrc;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.filter = filter;
+      ctx.drawImage(img, 0, 0);
+      const filteredImage = canvas.toDataURL("image/png");
+
+      if (photos.length < 4) {
+        setPhotos([...photos, filteredImage]);
+      }
+    };
+  };
+
+  const capture = () => {
+    let timer = delay;
+
+    setCountdown(timer);
+
+    const interval = setInterval(() => {
+      timer--;
+
+      if (timer > 0) {
+        setCountdown(timer);
+      } else {
+        clearInterval(interval);
+
+        setCountdown(null);
+
+        takePhoto();
+      }
+    }, 1000);
   };
 
   return (
@@ -29,10 +65,14 @@ export default function App() {
                 <select className="border rounded-xl px-4 py-2">
                   <option>4 Photos</option>
                 </select>
-                <select className="border rounded-xl px-4 py-2">
-                  <option>3s Delay</option>
-                  <option>5s Delay</option>
-                  <option>10s Delay</option>
+                <select
+                  value={delay}
+                  onChange={(e) => setDelay(Number(e.target.value))}
+                  className="border rounded-xl px-4 py-2"
+                >
+                  <option value={3}>3s Delay</option>
+                  <option value={5}>5s Delay</option>
+                  <option value={10}>10s Delay</option>
                 </select>
               </div>
               <button className="border border-pink-400 text-pink-500 px-4 py-2 rounded-xl font-semibold">
@@ -41,7 +81,14 @@ export default function App() {
             </div>
 
             {/* WEBCAM SECTION */}
-            <div className="overflow-hidden rounded-[20px]">
+            <div className="overflow-hidden rounded-[20px] relative">
+              {countDown && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+                  <h1 className="text-white text-8xl font-bold animate-pulse">
+                    {countDown}
+                  </h1>
+                </div>
+              )}
               <Webcam
                 style={{ filter: filter }}
                 className="w-full rounded-[20px]"
