@@ -1,16 +1,85 @@
-# React + Vite
+# 📸 Cute Photobooth
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fun, aesthetic browser-based photo booth app built with React. Take a 4-shot photo strip with filters, countdown timer, and download it as a PNG — just like a real photo booth!
 
-Currently, two official plugins are available:
+![Photo Booth Preview]()
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- 📷 **4-shot strip** — automatically captures 4 photos in sequence
+- ⏱️ **Countdown timer** — 3s, 5s, or 10s delay between shots
+- 🎨 **Filters** — Normal, B&W, Vintage, Warm, Dreamy
+- ⚡ **Flash effect** — subtle flash animation on each capture
+- 💾 **Download strip** — saves your photo strip as a PNG
+- 🎀 **Cute UI** — pink aesthetic with a tilted strip preview
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠️ Tech Stack
+
+- [React](https://react.dev/)
+- [react-webcam](https://github.com/mozmorris/react-webcam)
+- [dom-to-image-more](https://github.com/1904labs/dom-to-image-more)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Lucide React](https://lucide.dev/)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- A browser with webcam access
+
+### Installation
+
+```bash
+# Clone the repo
+git clone https://github.com/your-username/cute-photobooth.git
+cd cute-photobooth
+
+# Install dependencies
+npm install
+
+# Start the dev server
+npm run dev
+```
+
+Then open [http://localhost:5173](http://localhost:5173) in your browser and allow camera access.
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── App.jsx                  # Root component, wires everything together
+├── components/
+│   ├── CameraPanel.jsx      # Webcam view, controls, and capture button
+│   ├── PhotoStrip.jsx       # Strip preview and download logic
+│   ├── FilterSelector.jsx   # Filter buttons
+│   └── CountdownOverlay.jsx # Countdown + flash overlay
+└── hooks/
+    └── usePhotoCapture.js   # All capture state and logic
+```
+
+---
+
+## 🎮 How to Use
+
+1. **Choose your settings** — pick a countdown delay from the dropdown
+2. **Select a filter** — click any filter button below the webcam
+3. **Hit Start Capture** — the app will count down and take 4 photos automatically
+4. **Preview your strip** — photos appear on the right panel in real time
+5. **Download** — click the ⬇ button to save your strip as a PNG
+6. **Retake** — not happy? Hit Retake Photos and go again
+
+---
+
+## 🙏 Acknowledgements
+
+- Inspired by real-life photo booth machines
+- Built with ♡ using React + Tailwind
