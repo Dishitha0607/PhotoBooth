@@ -13,3 +13,20 @@ body{
 .title{
   font-family: 'Oswald', sans-serif;
 }
+
+@keyframes flash {
+  0%{
+    opacity: 0;
+    transform: scale(1);
+  }
+
+  30%{
+    opacity: 1;
+    transform: scale(1.02);
+  }
+
+  100%{
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}

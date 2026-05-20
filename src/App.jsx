@@ -10,10 +10,18 @@ export default function App() {
   // fillters
   const [filter, setFilter] = useState("none");
 
+  // flash
+  const [flash, setFlash] = useState(false);
+
   // camera delay
   const [delay, setDelay] = useState(3);
 
   const takePhoto = () => {
+    setFlash(true);
+    setTimeout(() => {
+      setFlash(false);
+    }, 150);
+
     const imgSrc = webcamRef.current.getScreenshot();
     const img = new Image();
     img.src = imgSrc;
@@ -82,6 +90,9 @@ export default function App() {
 
             {/* WEBCAM SECTION */}
             <div className="overflow-hidden rounded-[20px] relative">
+              {flash && (
+                <div className="absolute inset-0 bg-white z-20 animate-[flash_0.25s_ease-out]" />
+              )}
               {countDown && (
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
                   <h1 className="text-white text-8xl font-bold animate-pulse">
