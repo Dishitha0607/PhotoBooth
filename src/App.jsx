@@ -9,6 +9,8 @@ export default function App() {
 
   const [photos, setPhotos] = useState([]);
   const [countDown, setCountdown] = useState(null);
+  const [isCapturing, setisCapturing] = useState(false);
+  const [isDownload, setIsDownload] = useState(false);
 
   // fillters
   const [filter, setFilter] = useState("none");
@@ -25,26 +27,44 @@ export default function App() {
       setFlash(false);
     }, 150);
 
-    const imgSrc = webcamRef.current.getScreenshot();
+    const imgSrc = webcamRef.current?.getScreenshot();
+
+    if (!imgSrc) {
+      resolve();
+      return;
+    }
+
     const img = new Image();
     img.src = imgSrc;
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
       const ctx = canvas.getContext("2d");
+
       canvas.width = img.width;
       canvas.height = img.height;
+
       ctx.filter = filter;
       ctx.drawImage(img, 0, 0);
+
       const filteredImage = canvas.toDataURL("image/png");
 
-      if (photos.length < 4) {
-        setPhotos([...photos, filteredImage]);
-      }
+      takenPhotos.push(filteredImage);
+
+      setPhotos([...takenPhotos]);
+
+      resolve();
+    };
+
+    img.onerror = () => {
+      resolve();
     };
   };
 
   const capture = async () => {
+    if (isCapturing) return;
+    setisCapturing(true);
+
     let takenPhotos = [];
 
     for (let i = 0; i < 4; i++) {
@@ -95,37 +115,49 @@ export default function App() {
       // small pause between photos
       await new Promise((r) => setTimeout(r, 800));
     }
+    setisCapturing(false);
   };
 
   // download-hahaha
+  // Replace your downloadStrip function:
   const downloadStrip = async () => {
     try {
+      setIsDownload(true);
+      await new Promise((r) => setTimeout(r, 100));
+
       const node = stripRef.current;
 
       const dataUrl = await domtoimage.toPng(node, {
-        quality: 1,
-        bgcolor: "#ffdce8",
-
+        bgcolor: "#fce7f3",
         width: node.scrollWidth,
         height: node.scrollHeight,
-
         style: {
-          transform: "rotate(0deg)",
+          transform: "none",
           margin: "0",
+          outline: "none",
+          border: "none",
+          boxShadow: "none",
+        },
+        filter: (domNode) => {
+          if (domNode.style) {
+            domNode.style.outline = "none";
+            domNode.style.border = "none";
+            domNode.style.boxShadow = "none";
+          }
+          return true;
         },
       });
 
       const link = document.createElement("a");
-
       link.download = "cute-photobooth-strip.png";
       link.href = dataUrl;
-
       link.click();
     } catch (error) {
       console.error("Download failed:", error);
+    } finally {
+      setIsDownload(false);
     }
   };
-
   return (
     <>
       <div className="min-h-screen bg-[#fff7fb] flex items-center justify-center p-10">
@@ -174,6 +206,11 @@ export default function App() {
                 ref={webcamRef}
                 screenshotFormat="image/png"
                 mirrored={true}
+                videoConstraints={{
+                  width: 1280,
+                  height: 720,
+                  facingMode: "user",
+                }}
               />
             </div>
 
@@ -218,7 +255,10 @@ export default function App() {
             {/* CAPTURE BUTTON */}
             <button
               onClick={capture}
-              className="mt-8 w-full bg-pink-500 hover:bg-pink-600 transition-all text-white py-4 rounded-full text-lg font-semibold flex items-center justify-center gap-2"
+              disabled={isCapturing}
+              className={`mt-8 w-full transition-all text-white py-4 rounded-full text-lg font-semibold flex items-center justify-center gap-2
+            ${isCapturing ? "bg-pink-300 cursor-not-allowed" : "bg-pink-500 hover:bg-pink-600"}
+          `}
             >
               <Camera size={22} />
               Start Capture
@@ -235,21 +275,36 @@ export default function App() {
           {/* RIGHT PANEL */}
           <div
             ref={stripRef}
-            className="bg-pink-100 p-5 rounded-[10px] shadow-2xl w-[250px]"
+            className="bg-pink-100 p-5 rounded-[10px] shadow-2xl w-[250px] overflow-hidden"
             style={{
-              transform: "rotate(6deg)",
+              transform: isDownload ? "none" : "rotate(6deg)",
+              boxShadow: isDownload ? "none" : undefined, // strip shadow during download
+              outline: "none",
+              border: "none",
             }}
           >
             <div className="flex flex-col gap-4">
               {photos.map((photo, index) => (
-                <img key={index} src={photo} alt="" className="rounded-md " />
+                <img
+                  key={index}
+                  src={photo}
+                  alt=""
+                  style={{
+                    outline: "none",
+                    border: "none",
+                    boxShadow: "none",
+                    display: "block",
+                    borderRadius: "6px",
+                  }}
+                  className="rounded-md w-full block border-0 h-[140px] object-cover "
+                />
               ))}
 
               {/* EMPTY SLOTS */}
               {[...Array(4 - photos.length)].map((_, index) => (
                 <div
                   key={index}
-                  className="h-[140px] bg-white/50 rounded-md border-4 border-dashed border-pink-300"
+                  className="h-[140px] bg-white/50 rounded-md border-2 border-dashed border-pink-300"
                 />
               ))}
             </div>
