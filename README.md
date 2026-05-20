@@ -2,8 +2,18 @@
 
 A fun, aesthetic browser-based photo booth app built with React. Take a 4-shot photo strip with filters, countdown timer, and download it as a PNG — just like a real photo booth!
 
-![Photo Booth Preview](<img src="https://github.com/Dishitha0607/PhotoBooth/blob/8a734a66ca75e1fa19d88a73c671e9e9932a9c37/photos/Screenshot%202026-05-20%20160228.png" />)
-![After Downloading Preview](https://github.com/Dishitha0607/PhotoBooth/blob/32b8aa1df5df2be9b482c43a5f9c282396bbc031/photos/Screenshot%202026-05-20%20160247.png)
+<p align="center">
+  <img 
+    src="https://github.com/Dishitha0607/PhotoBooth/blob/main/photos/Screenshot%202026-05-20%20160228.png?raw=true" 
+    width="500" 
+  />
+</p>
+<p align="center">
+  <img 
+    src="https://raw.githubusercontent.com/Dishitha0607/PhotoBooth/32b8aa1df5df2be9b482c43a5f9c282396bbc031/photos/Screenshot%202026-05-20%20160247.png"
+    width="500"
+  />
+</p>
 
 ---
 
