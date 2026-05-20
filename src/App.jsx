@@ -44,26 +44,60 @@ export default function App() {
     };
   };
 
-  const capture = () => {
-    let timer = delay;
+  const capture = async () => {
+    let takenPhotos = [];
 
-    setCountdown(timer);
+    for (let i = 0; i < 4; i++) {
+      let timer = delay;
 
-    const interval = setInterval(() => {
-      timer--;
+      setCountdown(timer);
 
-      if (timer > 0) {
-        setCountdown(timer);
-      } else {
-        clearInterval(interval);
+      await new Promise((resolve) => {
+        const interval = setInterval(() => {
+          timer--;
 
-        setCountdown(null);
+          if (timer > 0) {
+            setCountdown(timer);
+          } else {
+            clearInterval(interval);
 
-        takePhoto();
-      }
-    }, 1000);
+            setCountdown(null);
+
+            const imgSrc = webcamRef.current.getScreenshot();
+
+            const img = new Image();
+            img.src = imgSrc;
+
+            img.onload = () => {
+              const canvas = document.createElement("canvas");
+              const ctx = canvas.getContext("2d");
+
+              canvas.width = img.width;
+              canvas.height = img.height;
+
+              ctx.filter = filter;
+              ctx.drawImage(img, 0, 0);
+
+              const filteredImage = canvas.toDataURL("image/png");
+
+              takenPhotos.push(filteredImage);
+
+              setPhotos([...takenPhotos]);
+
+              resolve();
+            };
+
+            resolve();
+          }
+        }, 1000);
+      });
+
+      // small pause between photos
+      await new Promise((r) => setTimeout(r, 800));
+    }
   };
 
+  // download-hahaha
   const downloadStrip = async () => {
     try {
       const node = stripRef.current;
@@ -114,8 +148,11 @@ export default function App() {
                   <option value={10}>10s Delay</option>
                 </select>
               </div>
-              <button className="border border-pink-400 text-pink-500 px-4 py-2 rounded-xl font-semibold">
-                Upload Photo
+              <button
+                onClick={downloadStrip}
+                className="border border-pink-400 text-pink-500 px-4 py-2 rounded-xl font-semibold"
+              >
+                <Download />
               </button>
             </div>
 
@@ -188,10 +225,10 @@ export default function App() {
             </button>
 
             <button
-              onClick={downloadStrip}
+              onClick={() => setPhotos([])}
               className="mt-4 w-full border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition-all py-4 rounded-full text-lg font-semibold"
             >
-              Download
+              Retake Photos
             </button>
           </div>
 
