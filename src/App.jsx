@@ -1,9 +1,12 @@
 import Webcam from "react-webcam";
-import { Camera } from "lucide-react";
+import { Camera, Download } from "lucide-react";
 import { useRef, useState } from "react";
+import domtoimage from "dom-to-image-more";
 
 export default function App() {
   const webcamRef = useRef(null);
+  const stripRef = useRef(null);
+
   const [photos, setPhotos] = useState([]);
   const [countDown, setCountdown] = useState(null);
 
@@ -61,6 +64,34 @@ export default function App() {
     }, 1000);
   };
 
+  const downloadStrip = async () => {
+    try {
+      const node = stripRef.current;
+
+      const dataUrl = await domtoimage.toPng(node, {
+        quality: 1,
+        bgcolor: "#ffdce8",
+
+        width: node.scrollWidth,
+        height: node.scrollHeight,
+
+        style: {
+          transform: "rotate(0deg)",
+          margin: "0",
+        },
+      });
+
+      const link = document.createElement("a");
+
+      link.download = "cute-photobooth-strip.png";
+      link.href = dataUrl;
+
+      link.click();
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
+  };
+
   return (
     <>
       <div className="min-h-screen bg-[#fff7fb] flex items-center justify-center p-10">
@@ -113,7 +144,7 @@ export default function App() {
             <div className="mt-6 text-center">
               <p className="text-gray-500 mb-4">Choose a fliter..</p>
 
-              <div className="flex gap-3 justify-center flex wrap">
+              <div className="flex gap-3 justify-center flex- wrap">
                 <button
                   onClick={() => setFilter("none")}
                   className="px-5 py-2 border rounded-full bg-pink-500 text-white"
@@ -155,20 +186,33 @@ export default function App() {
               <Camera size={22} />
               Start Capture
             </button>
+
+            <button
+              onClick={downloadStrip}
+              className="mt-4 w-full border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white transition-all py-4 rounded-full text-lg font-semibold"
+            >
+              Download
+            </button>
           </div>
 
           {/* RIGHT PANEL */}
-          <div className="rotate-6 bg-pink-100 p-5 rounded-[10px] shadow-2xl w-[250px]">
+          <div
+            ref={stripRef}
+            className="bg-pink-100 p-5 rounded-[10px] shadow-2xl w-[250px]"
+            style={{
+              transform: "rotate(6deg)",
+            }}
+          >
             <div className="flex flex-col gap-4">
               {photos.map((photo, index) => (
-                <img key={index} src={photo} alt="" className="rounded-md" />
+                <img key={index} src={photo} alt="" className="rounded-md " />
               ))}
 
               {/* EMPTY SLOTS */}
               {[...Array(4 - photos.length)].map((_, index) => (
                 <div
                   key={index}
-                  className="h-[140px] bg-white/50 rounded-md border-3 border-dashed border-pink-300"
+                  className="h-[140px] bg-white/50 rounded-md border-4 border-dashed border-pink-300"
                 />
               ))}
             </div>
